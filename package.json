@@ -1,9 +1,9 @@
 {
-  "name": "room-assets",
+  "name": "room-booking",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://kirillloginovsky.github.io/room-assets",
+  "homepage": "https://kirillloginovsky.github.io/room-booking",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
