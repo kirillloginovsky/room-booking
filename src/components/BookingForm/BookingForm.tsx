@@ -130,42 +130,33 @@ export function BookingForm({
           </div>
         </div>
 
-        {/* Статус — отдельная строка, всегда видна */}
+        {/* Статус — выпадающий список */}
         <div style={{ marginTop: 16 }}>
           <label style={{ display: "block", marginBottom: 8, fontWeight: 600 }}>
             Статус бронирования
           </label>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <select
+            className="filter-select"
+            value={form.status}
+            onChange={handleChange("status")}
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              borderRadius: 8,
+              border: `2px solid ${selectedStatus?.color ?? "#dfe4ea"}`,
+              fontSize: 15,
+              fontWeight: 600,
+              color: selectedStatus?.color ?? "#333",
+              background: selectedStatus ? selectedStatus.color + "18" : "#fafafa",
+              cursor: "pointer",
+            }}
+          >
             {STATUS_OPTIONS.map((opt) => (
-              <label
-                key={opt.value}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  border: `2px solid ${form.status === opt.value ? opt.color : "#dfe4ea"}`,
-                  background: form.status === opt.value ? opt.color + "18" : "#fafafa",
-                  cursor: "pointer",
-                  fontWeight: form.status === opt.value ? 600 : 400,
-                  color: form.status === opt.value ? opt.color : "#555",
-                  transition: "all 0.15s",
-                  userSelect: "none",
-                }}
-              >
-                <input
-                  type="radio"
-                  name="booking-status"
-                  value={opt.value}
-                  checked={form.status === opt.value}
-                  onChange={handleChange("status")}
-                  style={{ display: "none" }}
-                />
+              <option key={opt.value} value={opt.value}>
                 {opt.label}
-              </label>
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div style={{ marginTop: 16 }}>
