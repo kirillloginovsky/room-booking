@@ -31,6 +31,7 @@ export interface NewBookingPayload {
   date: string;
   startTime: string;
   endTime: string;
+  status?: BookingStatus;
   organizer: string;
   note?: string;
 }

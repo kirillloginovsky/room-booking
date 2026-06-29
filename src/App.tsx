@@ -56,7 +56,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const created = await api.createBooking({ ...payload, status: "pending" });
+      const created = await api.createBooking({ ...payload, status: payload.status ?? "pending" });
       setBookings((prev: any[]) => [created, ...prev]);
       setShowBookingForm(false);
     } catch (e) {
@@ -253,6 +253,7 @@ export default function App() {
             <BookingsTable
               bookings={bookings}
               onCancelBooking={(id) => updateBooking(id, { status: "cancelled" })}
+              onStatusChange={(id, status) => updateBooking(id, { status })}
               onEditBooking={(b) => {
                 setEditBooking(b);
                 setShowBookingForm(true);

@@ -6,13 +6,24 @@ interface BookingsTableProps {
   onCancelBooking: (id: string) => void;
   onEditBooking: (booking: Booking) => void;
   onDeleteBooking: (id: string) => void;
+  onStatusChange: (id: string, status: BookingStatus) => void;
 }
+
+const STATUS_CONFIG: Record<
+  BookingStatus,
+  { label: string; emoji: string; cls: string }
+> = {
+  confirmed: { label: "Подтверждена", emoji: "✅", cls: "status-confirmed" },
+  pending:   { label: "Ожидает",      emoji: "⏳", cls: "status-pending"   },
+  cancelled: { label: "Отменена",     emoji: "❌", cls: "status-cancelled"  },
+};
 
 export function BookingsTable({
   bookings,
   onCancelBooking,
   onEditBooking,
   onDeleteBooking,
+  onStatusChange,
 }: BookingsTableProps) {
   const [filtered, setFiltered] = useState<Booking[]>(bookings);
 
@@ -162,19 +173,21 @@ export function BookingsTable({
                   </td>
                   <td>{b.organizer}</td>
                   <td>
-                    <span
-                      className={`status-badge ${
-                        b.status === "confirmed"
-                          ? "status-confirmed"
-                          : b.status === "pending"
-                          ? "status-pending"
-                          : "status-cancelled"
-                      }`}
+                    <select
+                      className={`status-select status-select--${b.status}`}
+                      value={b.status}
+                      onChange={(e) =>
+                        onStatusChange(b.id, e.target.value as BookingStatus)
+                      }
                     >
-                      {b.status === "confirmed" && " Подтверждена"}
-                      {b.status === "pending" && "Ожидает"}
-                      {b.status === "cancelled" && " Отменена"}
-                    </span>
+                      {(Object.keys(STATUS_CONFIG) as BookingStatus[]).map(
+                        (s) => (
+                          <option key={s} value={s}>
+                            {STATUS_CONFIG[s].emoji} {STATUS_CONFIG[s].label}
+                          </option>
+                        )
+                      )}
+                    </select>
                   </td>
                   <td>{b.note || "—"}</td>
                   <td>

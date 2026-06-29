@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import type { Booking, NewBookingPayload } from "../../types/global";
+import type { Booking, BookingStatus, NewBookingPayload } from "../../types/global";
 
 interface BookingFormProps {
   mode: "create" | "edit";
@@ -8,6 +8,12 @@ interface BookingFormProps {
   onSubmit: (payload: NewBookingPayload) => void;
 }
 
+const STATUS_OPTIONS: { value: BookingStatus; label: string; color: string }[] = [
+  { value: "pending",   label: "⏳ Ожидает",    color: "#f39c12" },
+  { value: "confirmed", label: "✅ Подтверждено", color: "#27ae60" },
+  { value: "cancelled", label: "❌ Отменено",    color: "#e74c3c" },
+];
+
 export function BookingForm({
   mode,
   initialData,
@@ -15,18 +21,19 @@ export function BookingForm({
   onSubmit,
 }: BookingFormProps) {
   const [form, setForm] = useState<NewBookingPayload>({
-    roomCode: initialData?.roomCode ?? "",
-    roomName: initialData?.roomName ?? "",
-    date: initialData?.date ?? "",
+    roomCode:  initialData?.roomCode  ?? "",
+    roomName:  initialData?.roomName  ?? "",
+    date:      initialData?.date      ?? "",
     startTime: initialData?.startTime ?? "",
-    endTime: initialData?.endTime ?? "",
+    endTime:   initialData?.endTime   ?? "",
+    status:    initialData?.status    ?? "pending",
     organizer: initialData?.organizer ?? "",
-    note: initialData?.note ?? "",
+    note:      initialData?.note      ?? "",
   });
 
   const handleChange =
     (field: keyof NewBookingPayload) =>
-    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
@@ -47,12 +54,14 @@ export function BookingForm({
     onSubmit(form);
   };
 
+  const selectedStatus = STATUS_OPTIONS.find((s) => s.value === form.status);
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="filters-panel">
         <div className="filters-header">
           <h3 className="filters-title">
-            {mode === "create" ? " Новое бронирование" : " Редактирование бронирования"}
+            {mode === "create" ? "📋 Новое бронирование" : "✏️ Редактирование бронирования"}
           </h3>
         </div>
 
@@ -121,14 +130,46 @@ export function BookingForm({
           </div>
         </div>
 
+        {/* Статус — отдельная строка, всегда видна */}
         <div style={{ marginTop: 16 }}>
-          <label
-            style={{
-              display: "block",
-              marginBottom: 8,
-              fontWeight: 500,
-            }}
-          >
+          <label style={{ display: "block", marginBottom: 8, fontWeight: 600 }}>
+            Статус бронирования
+          </label>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {STATUS_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  border: `2px solid ${form.status === opt.value ? opt.color : "#dfe4ea"}`,
+                  background: form.status === opt.value ? opt.color + "18" : "#fafafa",
+                  cursor: "pointer",
+                  fontWeight: form.status === opt.value ? 600 : 400,
+                  color: form.status === opt.value ? opt.color : "#555",
+                  transition: "all 0.15s",
+                  userSelect: "none",
+                }}
+              >
+                <input
+                  type="radio"
+                  name="booking-status"
+                  value={opt.value}
+                  checked={form.status === opt.value}
+                  onChange={handleChange("status")}
+                  style={{ display: "none" }}
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <label style={{ display: "block", marginBottom: 8, fontWeight: 500 }}>
             Примечание
           </label>
           <textarea
@@ -155,8 +196,12 @@ export function BookingForm({
           >
             Отмена
           </button>
-          <button type="submit" className="primary-btn">
-             {mode === "create" ? "Создать бронирование" : "Сохранить изменения"}
+          <button
+            type="submit"
+            className="primary-btn"
+            style={{ background: selectedStatus?.color }}
+          >
+            {mode === "create" ? "➕ Создать бронирование" : "💾 Сохранить изменения"}
           </button>
         </div>
       </div>
